@@ -1,9 +1,11 @@
 # Use this file for your templated views only
 # label_music_manager/views.py
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import Http404
 from .models import Album, Song, AlbumTracklistItem
+from .forms import AlbumForm
+from django.contrib.auth.decorators import login_required, permission_required
 
 def album_list(request):
     albums = Album.objects.all()
@@ -38,3 +40,30 @@ def album_tracklist(request, album_id):
     
     tracklist_items = AlbumTracklistItem.objects.filter(album=album)
     return render(request, 'label_music_manager/album_tracklist.html', {'album': album, 'tracklist_items': tracklist_items})
+
+
+@login_required
+@permission_required('label_music_manager.add_album', raise_exception=True)
+def create_album(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('album_list')  # Redirect to the album list view after saving
+    else:
+        form = AlbumForm()
+    return render(request, 'label_music_manager/create_album.html', {'form': form})
+
+@login_required
+@permission_required('label_music_manager.change_album', raise_exception=True)
+def edit_album(request, album_id):
+    album = Album.objects.get(pk=album_id)
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, request.FILES, instance=album)
+        if form.is_valid():
+            form.save()
+            return redirect('album_detail', album_id=album.id)
+    else:
+        form = AlbumForm(instance=album)
+    return render(request, 'label_music_manager/edit_album.html', {'form': form, 'album': album})
+

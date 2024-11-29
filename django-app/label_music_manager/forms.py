@@ -3,7 +3,6 @@
 # These forms are typically used for creating, updating, or validating models or other data inputs. 
 # Provides a user-friendly way to create and validate data.
 
-# forms.py
 from django import forms
 from .models import Album, User
 
@@ -26,5 +25,20 @@ class AlbumForm(forms.ModelForm):
         if len(title) < 3:
             raise forms.ValidationError("Title must be at least 3 characters long.")
         return title
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
