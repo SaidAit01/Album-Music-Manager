@@ -1,11 +1,14 @@
 # Use this file for your templated views only
 # label_music_manager/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import Http404
-from .models import Album, Song, AlbumTracklistItem
-from .forms import AlbumForm, UserForm
+from django.urls import reverse
+from .models import Album, Song, AlbumTracklistItem,MusicManagerUser
+from .forms import AlbumForm
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseForbidden
+
 
 def album_list(request):
     albums = Album.objects.all()
@@ -67,59 +70,6 @@ def edit_album(request, album_id):
         form = AlbumForm(instance=album)
     return render(request, 'label_music_manager/edit_album.html', {'form': form, 'album': album})
 
-from django.contrib.auth.models import User
-
-@login_required
-@permission_required('auth.change_user', raise_exception=True)
-def update_user(request, user_id):
-    user = User.objects.get(pk=user_id)
-    if request.method == 'POST':
-        form = UserForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            return redirect('user_list')  # Redirect to a user list or detail view
-    else:
-        form = UserForm(instance=user)
-    return render(request, 'label_music_manager/update_user.html', {'form': form, 'user': user})
-
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponseForbidden
-from .models import Album
-
-@permission_required('label_music_manager.delete_album', raise_exception=True)
-def delete_album(request, album_id):
-    album = get_object_or_404(Album, pk=album_id)
-    if request.method == "POST":
-        album.delete()
-        return redirect('album_list')  # Redirect to the album list after deletion
-    return render(request, 'label_music_manager/album_confirm_delete.html', {'album': album})
-
-from django.shortcuts import render, redirect
-from .forms import SongForm
-
-def create_song(request):
-    if request.method == 'POST':
-        form = SongForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('song_list')
-    else:
-        form = SongForm()
-    return render(request, 'label_music_manager/song_form.html', {'form': form})
-
-from django.shortcuts import get_object_or_404
-
-def edit_song(request, song_id):
-    song = get_object_or_404(Song, pk=song_id)
-    if request.method == 'POST':
-        form = SongForm(request.POST, instance=song)
-        if form.is_valid():
-            form.save()
-            return redirect('song_list')
-    else:
-        form = SongForm(instance=song)
-    return render(request, 'label_music_manager/song_form.html', {'form': form})
 
 
 

@@ -4,7 +4,7 @@
 # Provides a user-friendly way to create and validate data.
 
 from django import forms
-from .models import Album, User, Song
+from .models import Album
 
 class AlbumForm(forms.ModelForm):
     class Meta:
@@ -25,25 +25,6 @@ class AlbumForm(forms.ModelForm):
         if len(title) < 3:
             raise forms.ValidationError("Title must be at least 3 characters long.")
         return title
-
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User  # Use your custom User model if applicable
-        fields = ['username', 'email', 'is_staff', 'is_active']  # Add fields like roles if applicable
-        widgets = {
-            'username': forms.TextInput(attrs={'placeholder': 'Enter username'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Enter email'}),
-        }
-        help_texts = {
-            'is_staff': 'Indicate if the user is an admin or editor.',
-            'is_active': 'Specify if the user account is active.',
-        }
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not email.endswith('@example.com'):
-            raise forms.ValidationError("Email must be from the 'example.com' domain.")
-        return email
 
 
 
