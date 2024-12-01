@@ -1,18 +1,13 @@
-# Use this file for your templated views only
 # label_music_manager/views.py
 
-from django.shortcuts import render, redirect,get_object_or_404
-from django.http import Http404
-from django.urls import reverse
-from .models import Album, Song, AlbumTracklistItem,MusicManagerUser
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404, HttpResponseForbidden
+from .models import Album, Song, AlbumTracklistItem
 from .forms import AlbumForm
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseForbidden
-
-from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("Welcome to MyMusicMaestro!")
+    return render(request, 'label_music_manager/home.html')
 
 def album_list(request):
     albums = Album.objects.all()
@@ -23,11 +18,8 @@ def album_detail(request, album_id):
         album = Album.objects.get(pk=album_id)
     except Album.DoesNotExist:
         raise Http404("Album does not exist")
-    
-    # Fetch the related tracklist entries for this album
+
     tracklist_items = AlbumTracklistItem.objects.filter(album=album)
-    
-    # Fetch the songs associated with this album's tracklist items
     songs = [tracklist_item.song for tracklist_item in tracklist_items]
     
     return render(request, 'label_music_manager/album_detail.html', {'album': album, 'songs': songs})
@@ -49,10 +41,9 @@ def album_tracklist(request, album_id):
         album = Album.objects.get(pk=album_id)
     except Album.DoesNotExist:
         raise Http404("Album does not exist")
-    
+
     tracklist_items = AlbumTracklistItem.objects.filter(album=album)
     return render(request, 'label_music_manager/album_tracklist.html', {'album': album, 'tracklist_items': tracklist_items})
-
 
 @login_required
 @permission_required('label_music_manager.add_album', raise_exception=True)
@@ -61,7 +52,7 @@ def create_album(request):
         form = AlbumForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('album_list')  # Redirect to the album list view after saving
+            return redirect('album_list')
     else:
         form = AlbumForm()
     return render(request, 'label_music_manager/create_album.html', {'form': form})
@@ -79,3 +70,17 @@ def edit_album(request, album_id):
         form = AlbumForm(instance=album)
     return render(request, 'label_music_manager/edit_album.html', {'form': form, 'album': album})
 
+@login_required
+@permission_required('label_music_manager.delete_album', raise_exception=True)
+def delete_album(request, album_id):
+    album = get_object_or_404(Album, pk=album_id)
+
+    # Check if the user is an artist of the album or an editor
+    if album.artist != request.user and not request.user.has_perm('label_music_manager.delete_album'):
+        return HttpResponseForbidden("You do not have permission to delete this album.")
+
+    if request.method == 'POST':
+        album.delete()
+        return redirect('album_list')  # Redirect to the album list view after deleting the album
+
+    return render(request, 'label_music_manager/delete_album.html', {'album': album})

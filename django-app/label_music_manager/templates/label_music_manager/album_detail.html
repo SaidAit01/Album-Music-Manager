@@ -10,11 +10,21 @@
     <p>Artist: {{ album.artist }}</p>
     <p>Description: {{ album.description }}</p>
     <p>Release Date: {{ album.release_date }}</p>
+    <img src="{{album.cover_image.url}}" alt="">
     <h2>Songs</h2>
     <ul>
         {% for song in songs %}
             <li>{{ song.title }} ({{ song.running_time }} seconds)</li>
         {% endfor %}
     </ul>
+    
+    {% if perms.label_music_manager.change_album %}
+        <a href="{% url 'edit_album' album.id %}">Edit Album</a>
+    {% endif %}
+    
+    {% if perms.label_music_manager.delete_album %}
+        <!-- Link to the confirmation page for deletion -->
+        <a href="{% url 'delete_album' album.id %}">Delete Album</a>
+    {% endif %}
 </body>
 </html>
