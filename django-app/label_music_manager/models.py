@@ -4,14 +4,14 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 
+
 class Album(models.Model):
     FORMAT_CHOICES = [
         ('CD', 'CD'),
         ('Vinyl', 'Vinyl'),
         ('Digital', 'Digital'),
     ]
-    name = models.CharField(max_length=255, default="Default Name")
-    title = models.CharField(max_length=255)  # Required album title
+    title= models.CharField(max_length=255,unique=True,)
     description = models.TextField(blank=True, null=True)  # Optional description
     artist = models.CharField(max_length=255)  # Artist name
     price = models.DecimalField(max_digits=6, decimal_places=2)  # Price with constraints
@@ -56,7 +56,7 @@ class Song(models.Model):
 
 
 class AlbumTracklistItem(models.Model):
-    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracklist')  # Reference to Album
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracklist_items')  # Reference to Album
     song = models.ForeignKey(Song, on_delete=models.CASCADE, related_name='tracklist_items')  # Reference to Song
     position = models.PositiveIntegerField()  # Position in the album's tracklist
 

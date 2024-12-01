@@ -1,0 +1,16 @@
+<!-- label_music_manager/templates/label_music_manager/create_album.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Album</title>
+</head>
+<body>
+    <h1>Create New Album</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Album</button>
+    </form>
+</body>
+</html>

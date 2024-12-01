@@ -1,0 +1,18 @@
+<!-- label_music_manager/templates/label_music_manager/album_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Album List</title>
+</head>
+<body>
+    <h1>Album List</h1>
+    <ul>
+        {% for album in albums %}
+            <li>
+                <a href="{% url 'album_detail' album.id %}">{{ album.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

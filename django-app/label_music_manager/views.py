@@ -9,6 +9,10 @@ from .forms import AlbumForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseForbidden
 
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to MyMusicMaestro!")
 
 def album_list(request):
     albums = Album.objects.all()
@@ -20,7 +24,12 @@ def album_detail(request, album_id):
     except Album.DoesNotExist:
         raise Http404("Album does not exist")
     
-    songs = Song.objects.filter(albumtracklistitem__album=album)
+    # Fetch the related tracklist entries for this album
+    tracklist_items = AlbumTracklistItem.objects.filter(album=album)
+    
+    # Fetch the songs associated with this album's tracklist items
+    songs = [tracklist_item.song for tracklist_item in tracklist_items]
+    
     return render(request, 'label_music_manager/album_detail.html', {'album': album, 'songs': songs})
 
 def song_list(request):
@@ -69,7 +78,3 @@ def edit_album(request, album_id):
     else:
         form = AlbumForm(instance=album)
     return render(request, 'label_music_manager/edit_album.html', {'form': form, 'album': album})
-
-
-
-

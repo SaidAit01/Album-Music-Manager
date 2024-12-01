@@ -1,0 +1,16 @@
+<!-- label_music_manager/templates/label_music_manager/album_tracklist.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tracklist for {{ album.title }}</title>
+</head>
+<body>
+    <h1>Tracklist for {{ album.title }}</h1>
+    <ol>
+        {% for item in tracklist_items %}
+            <li>{{ item.song.title }} (Position: {{ item.position }})</li>
+        {% endfor %}
+    </ol>
+</body>
+</html>

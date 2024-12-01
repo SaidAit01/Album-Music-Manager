@@ -1,0 +1,17 @@
+<!-- label_music_manager/templates/label_music_manager/edit_album.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Album</title>
+</head>
+<body>
+    <h1>Edit Album: {{ album.title }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>
+
