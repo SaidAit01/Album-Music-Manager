@@ -14,13 +14,6 @@ class AlbumViewSet(viewsets.ModelViewSet):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access albums
-    
-def get_queryset(self):
-        # If an artist is logged in, filter albums by the artist's name
-        user = self.request.user
-        if user.is_authenticated:
-            return Album.objects.filter(artist=user.display_name)
-        return Album.objects.all()
 
 
 class SongViewSet(viewsets.ModelViewSet):

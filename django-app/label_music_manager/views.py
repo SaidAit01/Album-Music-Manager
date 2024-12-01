@@ -78,3 +78,4 @@ def edit_album(request, album_id):
     else:
         form = AlbumForm(instance=album)
     return render(request, 'label_music_manager/edit_album.html', {'form': form, 'album': album})
+
