@@ -4,12 +4,17 @@
 # Provides a user-friendly way to create and validate data.
 
 from django import forms
-from .models import Album
+from .models import Album, Song
 
 class AlbumForm(forms.ModelForm):
+    songs = forms.ModelMultipleChoiceField(
+        queryset=Song.objects.all(),  # Allows users to select existing songs
+        widget=forms.CheckboxSelectMultiple,  # Can display checkboxes to select multiple songs
+        required=False  # Optional, so users don't have to select songs initially
+    )
     class Meta:
         model = Album
-        fields = ['title', 'artist', 'release_date', 'description', 'cover_image']  # Add any other relevant fields
+        fields = ['title', 'artist', 'release_date','price' , 'description', 'cover_image','songs']  # Add any other relevant fields
         widgets = {
             'release_date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -18,6 +23,9 @@ class AlbumForm(forms.ModelForm):
             'artist': 'Specify the artist of the album.',
             'release_date': 'Select the release date.',
             'description': 'Provide a short description of the album.',
+            'cover_image': 'Select an image for the album cover.',
+            'songs': 'Select songs associated with the album.',
+            'price': 'Enter the price of the album.',
         }
 
     def clean_title(self):

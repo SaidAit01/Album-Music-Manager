@@ -69,15 +69,21 @@ class AlbumTracklistItem(models.Model):
 
 
 class MusicManagerUser(AbstractUser):
-    # Extending the default Django User model
+    
+    # User roles
     ROLE_CHOICES = [
-        ('artist', 'Artist'),
-        ('editor', 'Editor'),
-        ('viewer', 'Viewer'),
+        ('artist', 'Artist'),  # Can view only their own albums based on display_name
+        ('editor', 'Editor'),  # Label employee with full edit permissions
+        ('viewer', 'Viewer'),  # View-only label employee
     ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)  # User's role
 
-    # Custom related names for groups and permissions to avoid conflicts
+    # Role field with enforced choices
+    role = models.CharField(max_length=512, choices=ROLE_CHOICES)
+
+    # Now enforce display_name to be required
+    display_name = models.CharField(max_length=512, null=False, blank=False)
+
+    # Overriding groups and permissions to use custom related names
     groups = models.ManyToManyField(
         Group,
         related_name="custom_music_manager_users",
@@ -89,5 +95,14 @@ class MusicManagerUser(AbstractUser):
         blank=True,
     )
 
+    # String representation of the user
     def __str__(self):
-        return self.username
+        return f"{self.display_name} ({self.get_role_display()})"
+
+    def can_edit(self):
+        return self.role == 'editor'
+
+    def can_view(self, album_artist):
+        if self.role == 'artist':
+            return self.display_name == album_artist
+        return self.role in ['editor', 'viewer']

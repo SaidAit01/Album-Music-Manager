@@ -11,7 +11,7 @@ from label_music_manager import api_views  # Import your API viewsets
 router = DefaultRouter()
 router.register(r'albums', api_views.AlbumViewSet)
 router.register(r'songs', api_views.SongViewSet)
-router.register(r'albumtracklistitems', api_views.AlbumTracklistItemViewSet)
+router.register(r'tracklist', api_views.AlbumTracklistItemViewSet)
 
 urlpatterns = [
     # Your application URLs (don't include 'label_music_manager.urls' here again)

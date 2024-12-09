@@ -1,29 +1,61 @@
 # label_music_manager/views.py
+import logging
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404, HttpResponseForbidden
 from .models import Album, Song, AlbumTracklistItem
 from .forms import AlbumForm
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LogoutView
+from django.views.decorators.http import require_GET
 
-def home(request):
-    return render(request, 'label_music_manager/home.html')
+logger = logging.getLogger(__name__)
 
+@login_required
 def album_list(request):
-    albums = Album.objects.all()
+    user = request.user
+    logger.info(f"User: {user.username}, is_superuser: {user.is_superuser}")
+
+    if user.is_superuser:
+        logger.info("Superuser detected. Showing all albums.")
+        albums = Album.objects.all()
+    elif hasattr(user, 'musicmanageruser'):
+        logger.info(f"User role: {getattr(user.musicmanageruser, 'role', 'No Role Found')}")
+        role = user.musicmanageruser.role
+
+        if role == 'artist':
+            albums = Album.objects.filter(artist=user.musicmanageruser.display_name)
+        else:
+            albums = Album.objects.all()
+    else:
+        logger.warning("User role not defined or insufficient permissions.")
+        return HttpResponseForbidden("User role not defined or insufficient permissions.")
+
     return render(request, 'label_music_manager/album_list.html', {'albums': albums})
 
-def album_detail(request, album_id):
-    try:
-        album = Album.objects.get(pk=album_id)
-    except Album.DoesNotExist:
-        raise Http404("Album does not exist")
+@login_required
+@permission_required('label_music_manager.album_detail', raise_exception=True)
 
-    tracklist_items = AlbumTracklistItem.objects.filter(album=album)
-    songs = [tracklist_item.song for tracklist_item in tracklist_items]
+
+def album_detail(request, album_id, slug=None):
+    # Retrieve the album by ID
+    album = get_object_or_404(Album, pk=album_id)
+
+    # If a slug is provided and it doesn't match, redirect to the correct slug URL
+    if slug and slug != album.slug:
+        return redirect('album_detail_with_slug', album_id=album.id, slug=album.slug)
     
-    return render(request, 'label_music_manager/album_detail.html', {'album': album, 'songs': songs})
 
+    # Retrieve the album's tracklist and associated songs
+    tracklist_items = AlbumTracklistItem.objects.filter(album=album)
+    songs = [item.song for item in tracklist_items]
+
+    # Render the album detail template
+    return render(request, 'label_music_manager/album_detail.html', {
+        'album': album,
+        'songs': songs,
+    })
 def song_list(request):
     songs = Song.objects.all()
     return render(request, 'label_music_manager/song_list.html', {'songs': songs})
@@ -46,19 +78,30 @@ def album_tracklist(request, album_id):
     return render(request, 'label_music_manager/album_tracklist.html', {'album': album, 'tracklist_items': tracklist_items})
 
 @login_required
-@permission_required('label_music_manager.add_album', raise_exception=True)
+@permission_required('label_music_manager.create_album', raise_exception=True)
 def create_album(request):
     if request.method == 'POST':
         form = AlbumForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            # Save the album first
+            album = form.save()
+
+            # Handle adding tracks via the AlbumTracklistItem model (separate from album creation)
+            songs = request.POST.getlist('songs')  # Get selected song IDs
+            for i, song_id in enumerate(songs):
+                song = Song.objects.get(id=song_id)
+                position = i + 1  # Position is set based on the order in the form submission
+                AlbumTracklistItem.objects.create(album=album, song=song, position=position)
+
+            # Redirect to the album list after successful creation
             return redirect('album_list')
     else:
         form = AlbumForm()
+
     return render(request, 'label_music_manager/create_album.html', {'form': form})
 
 @login_required
-@permission_required('label_music_manager.change_album', raise_exception=True)
+@permission_required('label_music_manager.edit_album', raise_exception=True)
 def edit_album(request, album_id):
     album = Album.objects.get(pk=album_id)
     if request.method == 'POST':
@@ -84,3 +127,10 @@ def delete_album(request, album_id):
         return redirect('album_list')  # Redirect to the album list view after deleting the album
 
     return render(request, 'label_music_manager/delete_album.html', {'album': album})
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'  # Path to your custom login template
+    redirect_authenticated_user = True  # Redirect already authenticated users
+
+class CustomLogoutView(LogoutView):
+    next_page = '/'  # Redirect after logout (optional)    
