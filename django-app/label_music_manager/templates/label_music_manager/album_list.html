@@ -1,19 +1,135 @@
-<!-- label_music_manager/templates/label_music_manager/album_list.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Album List</title>
-</head>
-<body>
-    <h1>Album List</h1>
-    <ul>
-        {% for album in albums %}
-            <li>
-                <a href="{% url 'album_detail' album.id %}">{{ album.title }}</a>
-            </li>
-        {% endfor %}
 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        /* Header Styling */
+        header {
+            background: linear-gradient(90deg, #4b6cb7, #182848);
+            color: white;
+            padding: 1rem 0;
+        }
+        header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+        header nav a {
+            color: white;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            margin: 0 10px;
+        }
+        header nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Styling */
+        footer {
+            background-color: #182848;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Album Card Styling */
+        .album-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .album-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .album-title {
+            font-family: 'Cinzel', serif;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <header>
+        <h1>Music Manager</h1>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #4b6cb7, #182848);">
+            <div class="container-fluid">
+                <!-- Left Side Links -->
+                <div class="navbar-nav">
+                    <a class="nav-link" href="{% url 'album_list' %}">Albums</a>
+                    <a class="nav-link" href="{% url 'create_album' %}">Create Album</a>
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </div>
     
+                <!-- Right Side User Info -->
+                <div class="d-flex align-items-center text-white">
+                    {% if user.is_authenticated %}
+                    <p class="mb-0 me-3" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                        <strong>{{ user.username }}</strong> - {{ role }}
+                    </p>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="text-center mb-4">
+            <h1 class="display-4 album-title">Album List</h1>
+            <p class="text-muted">Discover our collection of albums.</p>
+        </div>
+
+        <div class="row">
+            {% for album in albums %}
+            <div class="col-md-4 mb-4">
+                <div class="card album-card shadow-sm">
+                    {% if album.cover_image %}
+                    <img src="{{ album.cover_image.url }}" class="card-img-top" alt="{{ album.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Cover">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ album.title }}</h5>
+                        <p class="card-text text-muted">By {{ album.artist }}</p>
+                        <a href="{% url 'album_detail' album.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Music Manager. All Rights Reserved.</p>
+        <p>
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Terms of Service</a>
+        </p>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
