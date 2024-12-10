@@ -10,7 +10,7 @@
 
 from rest_framework import serializers
 from .models import Album, Song, AlbumTracklistItem
-#from rest_framework.models.permissions import DjangoPermissions
+
 
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,11 +43,11 @@ class AlbumSerializer(serializers.ModelSerializer):
         return obj.release_date.year if obj.release_date else None
 
     def get_total_playtime(self, obj):
-        # Sum the running time of all songs in the album's tracklist
+        
         return sum(item.song.running_time for item in obj.tracklist_items.all())
 
     def get_tracklist(self, obj):
-        # Generate hypermedia links for each track in the album
+       
         request = self.context.get('request')  # Use request context for building absolute URLstracklist_items = obj.tracklist_items.order_by('position')    
 
         return [
@@ -61,7 +61,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         ]
     
     def get_songs(self, obj):
-        # Serialize songs from the tracklist
+
         return [
             {
                 'id': item.song.id,

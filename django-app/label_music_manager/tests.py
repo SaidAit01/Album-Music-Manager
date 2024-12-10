@@ -75,18 +75,18 @@ class ViewTests(TestCase):
         self.editor = MusicManagerUser.objects.create_user(username="editor", password="password", role="editor")
 
         # Create album
-        self.album = Album.objects.create(title="Test Album", artist="Test Artist", price=10.99, format="CD", release_date="2024-12-01")
+        self.album = Album.objects.create(title="Test Album", artist="Test Artist", price=1.99, format="CD", release_date="2024-12-10")
 
 def test_album_list_view(self):
     self.client.login(username="editor", password="password")
     response = self.client.get(reverse("album_list"))
-    print(response.url)  # Debug where the redirect occurs
+    print(response.url) 
     self.assertEqual(response.status_code, 200)
 
 def test_album_detail_view(self):
     self.client.login(username="editor", password="password")
     response = self.client.get(reverse("album_detail", args=[self.album.id]))
-    print(response.url)  # Debug where the redirect occurs
+    print(response.url) 
     self.assertEqual(response.status_code, 200)
 
 from django.test import TestCase
@@ -117,7 +117,7 @@ class AlbumFormTests(TestCase):
             "title": "Test Album",
             "artist": "Test Artist",
             "price": 10,
-            "release_date": "2023-01-01",
+            "release_date": "2025-01-01",
         }, files={})
         self.assertTrue(form.is_valid())
 
@@ -126,7 +126,7 @@ class AlbumFormTests(TestCase):
             "title": "",  # Missing title
             "artist": "Test Artist",
             "price": 10,
-            "release_date": "2023-01-01",
+            "release_date": "2024-12-11",
         })
         self.assertFalse(form.is_valid())
 
@@ -155,8 +155,8 @@ class APIViewsTests(TestCase):
             title="Test Album",
             artist="Test Artist",
             price=10.99,
-            format="CD",
-            release_date="2023-01-01"
+            format="Degital",
+            release_date="2023-12-04"
         )
 
 

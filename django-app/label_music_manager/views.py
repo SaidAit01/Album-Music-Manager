@@ -47,7 +47,7 @@ def album_list(request):
 @permission_required('label_music_manager.album_detail', raise_exception=True)
 
 def album_detail(request, album_id, slug=None):
-    # Retrieve the album by ID
+ 
     album = get_object_or_404(Album, pk=album_id)
 
     # If a slug is provided and it doesn't match, redirect to the correct slug URL
@@ -71,7 +71,7 @@ def create_album(request):
     if request.method == 'POST':
         form = AlbumForm(request.POST, request.FILES)
         if form.is_valid():
-            # Save the album first
+            
             album = form.save()
 
             # Handle adding tracks via the AlbumTracklistItem model (separate from album creation)
@@ -119,6 +119,6 @@ def delete_album(request, album_id):
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
     redirect_authenticated_user = True  
-    
+
 class CustomLogoutView(LogoutView):
    next_page = '/accounts/login/'  
