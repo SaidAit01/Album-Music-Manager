@@ -1,6 +1,5 @@
 # label_music_manager/views.py
 import logging
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404, HttpResponseForbidden
 from .models import Album, Song, AlbumTracklistItem
@@ -13,6 +12,7 @@ from django.views.decorators.http import require_GET
 logger = logging.getLogger(__name__)
 
 @login_required
+@permission_required('label_music_manager.album_list', raise_exception=True)
 def album_list(request):
     user = request.user
     logger.info(f"User: {user.username}, is_superuser: {user.is_superuser}")
@@ -25,18 +25,26 @@ def album_list(request):
         role = user.musicmanageruser.role
 
         if role == 'artist':
+            logger.info("Artist detected. Filtering albums by artist name.")
             albums = Album.objects.filter(artist=user.musicmanageruser.display_name)
-        else:
+        elif role == 'viewer':
+            logger.info("Viewer detected. Showing all albums.")
             albums = Album.objects.all()
+        elif role == 'editor':
+            logger.info("Editor detected. Showing all albums with edit permissions.")
+            albums = Album.objects.all()
+        else:
+            logger.warning("User role not recognized. Returning insufficient permissions.")
+            return HttpResponseForbidden("User role not defined or insufficient permissions.")
     else:
         logger.warning("User role not defined or insufficient permissions.")
         return HttpResponseForbidden("User role not defined or insufficient permissions.")
 
     return render(request, 'label_music_manager/album_list.html', {'albums': albums})
 
+
 @login_required
 @permission_required('label_music_manager.album_detail', raise_exception=True)
-
 
 def album_detail(request, album_id, slug=None):
     # Retrieve the album by ID
@@ -56,26 +64,6 @@ def album_detail(request, album_id, slug=None):
         'album': album,
         'songs': songs,
     })
-def song_list(request):
-    songs = Song.objects.all()
-    return render(request, 'label_music_manager/song_list.html', {'songs': songs})
-
-def song_detail(request, song_id):
-    try:
-        song = Song.objects.get(pk=song_id)
-    except Song.DoesNotExist:
-        raise Http404("Song does not exist")
-    
-    return render(request, 'label_music_manager/song_detail.html', {'song': song})
-
-def album_tracklist(request, album_id):
-    try:
-        album = Album.objects.get(pk=album_id)
-    except Album.DoesNotExist:
-        raise Http404("Album does not exist")
-
-    tracklist_items = AlbumTracklistItem.objects.filter(album=album)
-    return render(request, 'label_music_manager/album_tracklist.html', {'album': album, 'tracklist_items': tracklist_items})
 
 @login_required
 @permission_required('label_music_manager.create_album', raise_exception=True)
@@ -129,8 +117,8 @@ def delete_album(request, album_id):
     return render(request, 'label_music_manager/delete_album.html', {'album': album})
 
 class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'  # Path to your custom login template
-    redirect_authenticated_user = True  # Redirect already authenticated users
-
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = True  
+    
 class CustomLogoutView(LogoutView):
-    next_page = '/'  # Redirect after logout (optional)    
+   next_page = '/accounts/login/'  

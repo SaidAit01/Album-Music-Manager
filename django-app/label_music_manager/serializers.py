@@ -109,4 +109,8 @@ class AlbumTracklistItemSerializer(serializers.ModelSerializer):
         model = AlbumTracklistItem
         fields = ['album', 'song', 'position']
 
+    def get_total_playtime(self, obj):
+        # Calculate total playtime as the sum of all song running times in the album
+        return sum(item.song.running_time for item in obj.tracklist_items.all())    
+
 

@@ -27,10 +27,9 @@ urlpatterns = [
     # Album list
     path('albums/', views.album_list, name='album_list'),
     path('albums/new/', views.create_album, name='create_album'),
-
-
-
-
+    path('accounts/login/', CustomLoginView.as_view(), name='login'),
+    path('accounts/logout/', CustomLogoutView.as_view(), name='logout'),
+    
 
     # Routes for API endpoints
     path('api/', include(router.urls)),

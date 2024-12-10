@@ -77,13 +77,13 @@ class MusicManagerUser(AbstractUser):
         ('viewer', 'Viewer'),  # View-only label employee
     ]
 
-    # Role field with enforced choices
+    
     role = models.CharField(max_length=512, choices=ROLE_CHOICES)
 
-    # Now enforce display_name to be required
+    
     display_name = models.CharField(max_length=512, null=False, blank=False)
 
-    # Overriding groups and permissions to use custom related names
+
     groups = models.ManyToManyField(
         Group,
         related_name="custom_music_manager_users",
