@@ -1,18 +1,44 @@
-# COM2025 coursework skeleton
+# MyMusicMaestro
 
-## Getting started with the Django application
-- From the command line, navigate to the `django-app` folder using `cd django-app`
-- Install the dependencies by running `python3 -m pip install -r requirements.txt`
-  - You may need to use a virtual environment using `venv` depending on your installation  
-- Manage the application using the management tools with `python3 manage.py` 
+## Key Features
+✔ Album Discovery: Browse music with rich visuals and metadata
+✔ Interactive UI: Smooth hover animations and responsive design
+✔ Search Functionality: Find albums by title, artist, or year
+✔ Admin Dashboard: Django backend for content management
+✔ RESTful API: Headless architecture for scalability
 
-Your API views must be placed in the `api_views.py` file, with templated user-facing routes  written in `views.py`. These will need importing as required in the subapp's `urls.py`.
+## Setup Guide
+### Prerequisites
 
-## Getting started with the React application
-- From the command line, navigate to the `react-app` folder using `cd react-app`
-- Install the dependencies by running `npm install`
-- Start the application by running `npm run start`
+Python 3.8+
+Node.js 16+
+PostgreSQL (optional)
 
-## Submitting
-You must commit your work to the `main` branch in your individual Surrey GitLab repository for this module. The last commit on this branch will be marked.
+### installation 
+1. Backend Setup :
+
+```
+cd django-app
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+2. Frontend SetUp :
+
+```
+cd react-app
+npm install
+npm start
+```
+## Project Structure : 
+```
+MyMusicMaestro/  
+├── django-app/            # Django backend  
+│   ├── label_music_manager/ # Core app  
+│   └── media/              # Album covers storage  
+├── react-app/             # React frontend  
+│   ├── src/components/     # Reusable UI  
+│   └── src/pages/          # Views
+
+``` 
 
