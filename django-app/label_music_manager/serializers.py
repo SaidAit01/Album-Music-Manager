@@ -30,7 +30,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = Album
         fields = [
             'id', 'title', 'artist', 'price', 'release_date', 'cover_image',
-            'short_description', 'release_year', 'total_playtime', 'tracklist','songs',
+            'short_description', 'release_year', 'format', 'total_playtime', 'tracklist','songs',
         ]
         
 

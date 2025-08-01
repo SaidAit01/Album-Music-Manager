@@ -3,6 +3,26 @@ import { Link } from "react-router-dom";
 import { Card, Badge } from "react-bootstrap";
 
 function AlbumCard({ album }) {
+  // Add defensive checks for album and its properties
+  if (!album) {
+    return <div className="mb-4">No album data available</div>;
+  }
+
+  const {
+    id = "",
+    title = "Untitled Album",
+    artist = "Unknown Artist",
+    release_year = "Unknown Year",
+    short_description = "",
+    cover_image = "default_image_url.jpg"
+  } = album || {};
+
+  const truncatedDescription = short_description 
+    ? (short_description.length > 100
+        ? `${short_description.slice(0, 100)}...`
+        : short_description)
+    : "No description available";
+
   return (
     <Card
       className="mb-4 album-card"
@@ -24,44 +44,42 @@ function AlbumCard({ album }) {
       {/* Album Cover */}
       <Card.Img
         variant="top"
-        src={album.cover_image || "default_image_url.jpg"}
-        alt={album.title}
+        src={cover_image}
+        alt={title}
         style={{
           width: "100%",
-          height: "auto", // Keep original size
+          height: "auto",
         }}
       />
       <Card.Body>
         {/* Album Title */}
         <Card.Title style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
           <Link
-            to={`/albums/${album.id}`}
+            to={`/albums/${id}`}
             style={{
               textDecoration: "none",
               color: "#333",
             }}
           >
-            {album.title}
+            {title}
           </Link>
         </Card.Title>
         {/* Artist and Release Year */}
         <Card.Text>
           <Badge bg="info" style={{ fontSize: "0.9rem", marginRight: "5px" }}>
-            {album.artist}
+            {artist}
           </Badge>
           <span style={{ color: "#6c757d", fontSize: "0.9rem" }}>
-            {album.release_year}
+            {release_year}
           </span>
         </Card.Text>
         {/* Brief Description */}
         <Card.Text style={{ fontSize: "0.9rem", color: "#555" }}>
-          {album.short_description.length > 100
-            ? `${album.short_description.slice(0, 100)}...`
-            : album.short_description}
+          {truncatedDescription}
         </Card.Text>
         {/* View Album Button */}
         <Link
-          to={`/albums/${album.id}`}
+          to={`/albums/${id}`}
           style={{
             display: "inline-block",
             backgroundColor: "#007BFF",

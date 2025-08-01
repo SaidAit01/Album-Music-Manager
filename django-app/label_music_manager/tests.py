@@ -123,9 +123,9 @@ class AlbumFormTests(TestCase):
 
     def test_form_invalid_data(self):
         form = AlbumForm(data={
-            "title": "",  # Missing title
+            "title": "",  
             "artist": "Test Artist",
-            "price": 10,
+            "price": 20,
             "release_date": "2024-12-11",
         })
         self.assertFalse(form.is_valid())
@@ -155,7 +155,7 @@ class APIViewsTests(TestCase):
             title="Test Album",
             artist="Test Artist",
             price=10.99,
-            format="Degital",
+            format="Digital",
             release_date="2023-12-04"
         )
 
